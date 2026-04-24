@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intermolecular Forces Training Game</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .menu-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .menu-btn:hover {
+            background-color: #2980b9;
+        }
+        .secondary-btn {
+            background-color: #95a5a6;
+        }
+        .secondary-btn:hover {
+            background-color: #7f8c8d;
+        }
+        .hidden {
+            display: none;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f8f5;
+            border-left: 5px solid #1abc9c;
+            border-radius: 4px;
+        }
+        .score-display {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #bdc3c7;
+            text-align: center;
+        }
+        .score-display span {
+            color: #27ae60;
+            font-size: 24px;
+        }
+        .official-answer {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #fcf3cf;
+            border-left: 5px solid #f1c40f;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+        .keyword-chip {
+            display: inline-block;
+            background: #e74c3c;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 13px;
+            margin: 3px;
+        }
+        .keyword-chip.found {
+            background: #2ecc71;
+        }
+        .highlight {
+            background-color: #ffeaa7;
+            color: #d35400;
+            font-weight: bold;
+            padding: 0 4px;
+            border-radius: 3px;
+            border: 1px dashed #e67e22;
+        }
+        #question-image {
+            max-width: 100%;
+            height: auto;
+            margin: 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Intermolecular Forces Mastery</h1>
+    
+    <div id="main-menu">
+        <h2>What would you like to train on today?</h2>
+        <button class="menu-btn" onclick="showQuestionSelection('comparingBP')">Comparing Melting / Boiling Points</button>
+        <button class="menu-btn" onclick="showQuestionSelection('solubility')">Explaining Solubility</button>
+    </div>
+
+    <div id="question-list-section" class="hidden">
+        <h2>Select Substances to Compare</h2>
+        <div id="question-buttons-container"></div>
+        <button class="menu-btn secondary-btn" onclick="showSection('main-menu')">Back to Main Menu</button>
+    </div>
+
+    <div id="drill-section" class="hidden">
+        <h2 id="drill-title">Question</h2>
+        <div id="question-text" style="font-size: 18px; font-weight: bold; margin-bottom: 10px;"></div>
+        <img id="question-image" class="hidden" src="" alt="Question Context Image">
+        <p>Type your explanation below. Remember to mention the types of IMF, compare their strengths, and mention energy required to overcome them.</p>
+        <textarea id="student-answer" placeholder="Your answer here..."></textarea>
+        <button class="menu-btn" onclick="checkAnswer()">Submit Answer</button>
+        <button class="menu-btn secondary-btn" onclick="showSection('question-list-section')">Back to Selection</button>
+    </div>
+
+    <div id="feedback-section" class="hidden">
+        <h2>Feedback</h2>
+        <div id="feedback-text" class="feedback"></div>
+        <h3>Official Answer:</h3>
+        <p style="font-size: 14px; color: #555;">(Keywords are highlighted for quick reference)</p>
+        <div id="official-answer-text" class="official-answer"></div>
+        <button class="menu-btn" id="next-btn" onclick="showSection('question-list-section')">Back to Question List</button>
+        <button class="menu-btn secondary-btn" onclick="showSection('main-menu')">Back to Main Menu</button>
+    </div>
+</div>
+
+<script>
+    const data = {
+        comparingBP: [
+            {
+                title: "Propane vs Ethanal",
+                q: "Account for the difference in boiling point between propane (CH₃CH₂CH₃) and ethanal (CH₃CHO).",
+                keywords: ["london forces", "electrons", "polar", "permanent dipole", "non-polar", "stronger", "energy to overcome"],
+                official: "1. Both propane and ethanal have London forces between molecules of the same strength because they have the same number of electrons.\n2. Ethanal is polar, so it has additional permanent dipole-permanent dipole interactions.\n3. Propane is non-polar so it only has London forces.\n4. So, the total intermolecular forces in ethanal are stronger than that in propane, which requires more energy to overcome.\n5. So, ethanal has a higher boiling point."
+            },
+            {
+                title: "Trichloromethane vs Tetrachloromethane",
+                q: "Account for the difference in boiling point between trichloromethane (CHCl₃) and tetrachloromethane (CCl₄).",
+                keywords: ["london forces", "polar", "permanent dipole", "non-polar", "more electrons", "stronger", "energy to overcome"],
+                official: "1. Both CHCl₃ and CCl₄ have London forces between molecules.\n2. CHCl₃ is polar, so it has additional permanent dipole-permanent dipole interactions.\n3. CCl₄ is non-polar, so it only has London forces. However, CCl₄ has significantly more electrons, so the London force in CCl₄ is stronger.\n4. The London forces in CCl₄ are stronger than the total intermolecular forces in CHCl₃, which requires more energy to overcome.\n5. So, CCl₄ has a higher boiling point."
+            },
+            {
+                title: "HF, HCl, HBr, HI",
+                q: "Compare the boiling points of HF, HCl, HBr and HI.",
+                keywords: ["hydrogen bonds", "strongest", "polar", "permanent dipole", "electrons", "london forces", "increases", "energy to overcome"],
+                official: "1. HF has the highest boiling point, because only HF has hydrogen bonds between molecules, which is the strongest type of intermolecular force.\n2. Even though HCl is more polar than HBr and HI (forming stronger permanent dipole-permanent dipole interactions), the number of electrons significantly increases from HCl to HI.\n3. So, the London forces significantly increase from HCl to HI.\n4. So the total intermolecular forces increase from HCl to HBr to HI, which requires more energy to overcome.\n5. Boiling point order: HF > HI > HBr > HCl."
+            },
+            {
+                title: "CH₄, NH₃, H₂O, HF",
+                q: "Explain the differences in boiling temperatures of CH₄, NH₃, H₂O, and HF by considering all the intermolecular forces involved.",
+                keywords: ["two hydrogen bonds", "one", "electronegativity", "stronger", "london forces", "weaker", "energy"],
+                official: "1. H₂O has a higher boiling point than HF because H₂O can form two hydrogen bonds per molecule but HF can only form one.\n2. HF has a higher boiling point than NH₃. Both have hydrogen bonds, but fluorine has higher electronegativity than N.\n3. So the hydrogen bond in HF is stronger than that in NH₃, requiring more energy to break.\n4. NH₃ has a higher boiling point than CH₄ because NH₃ has hydrogen bonds, but CH₄ only has London forces.\n5. London forces are weaker than hydrogen bonds. \nOverall Order: H₂O > HF > NH₃ > CH₄."
+            },
+            {
+                title: "1-chloropropane vs 1-bromopropane vs 1-iodopropane",
+                q: "Explain the trend in boiling temperature of 1-chloropropane, 1-bromopropane, and 1-iodopropane by comparing the intermolecular forces involved.",
+                keywords: ["london forces", "permanent dipole", "electrons", "increases", "polarity decreases", "total intermolecular forces", "energy to break"],
+                official: "1. They all have London forces and permanent dipole-permanent dipole interactions.\n2. From 1-chloropropane to 1-iodopropane, the number of electrons significantly increases, so the strength of London forces increases significantly.\n3. From 1-chloropropane to 1-iodopropane, the polarity of the molecule decreases, so the strength of permanent dipole-permanent dipole interactions decreases.\n4. Still, the total intermolecular forces increase from 1-chloropropane to 1-iodopropane, requiring more energy to break. So the boiling point increases accordingly."
+            },
+            {
+                title: "Ammonia vs Water",
+                q: "Compare and contrast the effect of intermolecular forces on the boiling points of water (H₂O) and ammonia (NH₃).",
+                keywords: ["electrons", "london forces", "similar", "two hydrogen bonds", "one", "energy to overcome"],
+                official: "1. Both molecules have the same number of electrons, so the London forces between molecules are similar.\n2. However, water forms two hydrogen bonds per molecule but ammonia only forms one.\n3. Therefore, the hydrogen bonds in water require more energy to overcome.\n4. So, water has a higher boiling point than ammonia."
+            },
+            {
+                title: "Fluorine vs Hydrogen chloride vs Methanol",
+                q: "Explain the large variation in boiling temperatures of fluorine (F₂), hydrogen chloride (HCl), and methanol (CH₃OH), given their small range in molar mass.",
+                keywords: ["hydrogen bond", "strongest", "london forces", "similar", "polar", "permanent dipole", "non-polar", "stronger", "energy to break"],
+                official: "1. Methanol (CH₃OH) has the highest boiling point because it has hydrogen bonds between molecules, which is the strongest type of intermolecular force.\n2. HCl has a higher boiling point than F₂. Both have London forces of similar strength because they have the same number of electrons.\n3. However, HCl is polar, so it has additional permanent dipole-permanent dipole interactions.\n4. F₂ is non-polar, so it only has London forces.\n5. Therefore, the total intermolecular forces in HCl are stronger than that in F₂, requiring more energy to break."
+            },
+            {
+                title: "Alcohols vs Thiols",
+                q: "Describe and explain the differences in boiling points shown in the graph of alcohols vs thiols.",
+                image: "image_d1d340.jpg",
+                keywords: ["carbon increases", "electrons", "surface area", "london forces", "hydrogen bond", "strongest", "energy", "difference decreases", "significant"],
+                official: "1. For both alcohol and thiol, when the number of carbon atoms increases, the boiling point increases. This is because the number of electrons increases and the contact surface area increases, so the strength of London forces increases.\n2. Alcohol has hydrogen bonds between molecules but thiol does not. For the same number of carbons, thiol has more electrons and hence stronger London forces.\n3. However, since the hydrogen bond is the strongest type of intermolecular force, it requires more energy to overcome. So, alcohol has a higher boiling point than thiol of the same carbon number.\n4. However, the difference in boiling point between alcohol and thiol decreases as the number of carbons increases. This is because as London forces become stronger, their effect becomes more and more significant."
+            },
+            {
+                title: "Pentane vs 2,2-dimethylpropane",
+                q: "Compare the boiling points of pentane and 2,2-dimethylpropane (both C₅H₁₂).",
+                keywords: ["london forces", "surface area", "branched", "stronger", "energy to overcome"],
+                official: "1. Both molecules are non-polar and have the same number of electrons, so they both rely on London forces.\n2. Pentane is less branched than 2,2-dimethylpropane, so it has a greater contact surface area between molecules.\n3. This leads to stronger London forces between pentane molecules.\n4. Stronger London forces require more energy to overcome, giving pentane a higher boiling point."
+            },
+            {
+                title: "Propan-1-ol vs Glycerol",
+                q: "Compare the boiling points of propan-1-ol and propane-1,2,3-triol (glycerol).",
+                keywords: ["hydrogen bonds", "more", "london forces", "energy to overcome", "stronger"],
+                official: "1. Both molecules form hydrogen bonds and have London forces.\n2. Propane-1,2,3-triol has three -OH groups per molecule, whereas propan-1-ol only has one.\n3. Therefore, propane-1,2,3-triol can form significantly more hydrogen bonds per molecule.\n4. This results in stronger total intermolecular forces that require much more energy to overcome, giving propane-1,2,3-triol a much higher boiling point."
+            }
+        ],
+        solubility: [
+            {
+                title: "Ethanol in Water",
+                q: "Explain why ethanol (CH₃CH₂OH) is very soluble in water.",
+                keywords: ["hydrogen bonds", "imf formed", "imf broken", "stronger"],
+                official: "1. Hydrogen bonds and London forces are formed between ethanol and water molecules.\n2. The total IMF formed between ethanol and water is STRONGER than the IMF broken in ethanol (solute) and in water (solvent).\n3. Because the energy released by forming new bonds compensates for the energy absorbed breaking old bonds, ethanol is very soluble in water."
+            },
+            {
+                title: "Heptan-1-ol in Water",
+                q: "Explain why heptan-1-ol is insoluble / only very slightly soluble in water.",
+                keywords: ["imf formed", "imf broken", "weaker", "long", "carbon chain"],
+                official: "1. Hydrogen bonds and weaker London forces are formed between heptan-1-ol and water.\n2. Because heptan-1-ol has a long carbon chain, the strong hydrogen bonds between water molecules are disrupted.\n3. The total IMF formed between heptan-1-ol and water is WEAKER than the IMF broken in heptan-1-ol and in water.\n4. Therefore, it is insoluble / only very slightly soluble in water."
+            },
+            {
+                title: "Alcohol B in Ethanol vs Water",
+                q: "Consider Alcohol B (a primary alcohol C₆H₁₄O). Explain why it is completely soluble in ethanol but only slightly soluble in water.",
+                keywords: ["imf formed", "imf broken", "stronger", "weaker"],
+                official: "1. Hydrogen bonds and significant London forces would be formed between Alcohol B and ethanol.\n2. The total IMF formed between B and ethanol is STRONGER than that broken in B and in ethanol, so it is soluble in ethanol.\n3. However, hydrogen bonds and weaker London forces would be formed between B and water.\n4. The total IMF formed between B and water is WEAKER than that broken in B and in water, so B is only slightly soluble in water."
+            },
+            {
+                title: "Bromine in Water vs Hexane",
+                q: "Explain why bromine (Br₂) is only slightly soluble in water, but much more soluble in hexane.",
+                keywords: ["non-polar", "london forces", "imf formed", "imf broken", "hydrogen bonds", "weaker", "similar", "stronger"],
+                official: "1. Bromine and hexane are both non-polar, so London forces are formed between them. The IMF formed between bromine and hexane is similar in strength/stronger than the London forces broken in bromine and in hexane, making it soluble.\n2. Water forms strong hydrogen bonds. Bromine can only form weak London forces with water.\n3. The IMF formed between bromine and water is much WEAKER than the strong hydrogen bonds broken in water.\n4. Therefore, bromine is only slightly soluble in water."
+            }
+        ]
+    };
+
+    let currentMode = '';
+    let currentQuestions = [];
+    let currentQuestionIndex = 0;
+
+    function showSection(sectionId) {
+        document.getElementById('main-menu').classList.add('hidden');
+        document.getElementById('question-list-section').classList.add('hidden');
+        document.getElementById('drill-section').classList.add('hidden');
+        document.getElementById('feedback-section').classList.add('hidden');
+        
+        document.getElementById(sectionId).classList.remove('hidden');
+    }
+
+    function showQuestionSelection(mode) {
+        currentMode = mode;
+        currentQuestions = data[mode];
+        
+        let container = document.getElementById('question-buttons-container');
+        container.innerHTML = ''; 
+        
+        currentQuestions.forEach((qData, index) => {
+            let btn = document.createElement('button');
+            btn.className = 'menu-btn';
+            btn.innerText = qData.title;
+            btn.onclick = () => loadSpecificQuestion(index);
+            container.appendChild(btn);
+        });
+
+        showSection('question-list-section');
+    }
+
+    function loadSpecificQuestion(index) {
+        currentQuestionIndex = index;
+        document.getElementById('student-answer').value = '';
+        
+        const qData = currentQuestions[currentQuestionIndex];
+        document.getElementById('question-text').innerText = qData.q;
+        document.getElementById('drill-title').innerText = "Drill: " + qData.title;
+        
+        // Handle image logic
+        const imgEl = document.getElementById('question-image');
+        if (qData.image) {
+            imgEl.src = qData.image;
+            imgEl.classList.remove('hidden');
+        } else {
+            imgEl.classList.add('hidden');
+        }
+        
+        showSection('drill-section');
+    }
+
+    function checkAnswer() {
+        const studentText = document.getElementById('student-answer').value.toLowerCase();
+        const qData = currentQuestions[currentQuestionIndex];
+        
+        let score = 0;
+        let keywordAnalysisHTML = "<div>";
+        
+        qData.keywords.forEach(kw => {
+            if (studentText.includes(kw)) {
+                keywordAnalysisHTML += `<span class="keyword-chip found">✓ ${kw}</span>`;
+                score++;
+            } else {
+                keywordAnalysisHTML += `<span class="keyword-chip">✗ ${kw}</span>`;
+            }
+        });
+        
+        keywordAnalysisHTML += "</div>";
+
+        const maxMarks = qData.keywords.length;
+        let feedbackHTML = `<div class="score-display">Estimated Score: <span>${score}</span> / ${maxMarks} marks</div>`;
+        
+        feedbackHTML += "<p><strong>Analysing your response for key concepts:</strong></p>" + keywordAnalysisHTML;
+        
+        if (score === maxMarks) {
+            feedbackHTML += "<p style='color: #27ae60; font-weight: bold; margin-top: 10px;'>Excellent! You hit all the major points required for full marks.</p>";
+        } else if (score >= maxMarks / 2) {
+            feedbackHTML += "<p style='color: #d35400; font-weight: bold; margin-top: 10px;'>Good effort. Review the missing keywords and the official answer below to perfect your structure.</p>";
+        } else {
+            feedbackHTML += "<p style='color: #c0392b; font-weight: bold; margin-top: 10px;'>You missed several key concepts. In exams, you must explicitly mention specific forces and energy. Compare your answer to the official one.</p>";
+        }
+
+        if(currentMode === 'solubility' && (!studentText.includes('formed') || !studentText.includes('broken'))) {
+             feedbackHTML += "<p style='color: #c0392b; font-weight: bold;'>Critical Error: For solubility questions, you MUST explicitly compare the 'IMF formed' versus the 'IMF broken'.</p>";
+        }
+
+        document.getElementById('feedback-text').innerHTML = feedbackHTML;
+        
+        let officialHTML = qData.official;
+        let tokens = [];
+        
+        let sortedKeywords = [...qData.keywords].sort((a, b) => b.length - a.length);
+        
+        sortedKeywords.forEach((kw) => {
+            let regex = new RegExp(kw, 'gi');
+            officialHTML = officialHTML.replace(regex, match => {
+                tokens.push(`<span class="highlight">${match}</span>`);
+                return `%%TOKEN${tokens.length - 1}%%`;
+            });
+        });
+        
+        tokens.forEach((token, i) => {
+            officialHTML = officialHTML.replace(`%%TOKEN${i}%%`, token);
+        });
+
+        document.getElementById('official-answer-text').innerHTML = officialHTML;
+        
+        showSection('feedback-section');
+    }
+</script>
+
+</body>
+</html>
